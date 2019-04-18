@@ -15,4 +15,12 @@
             android:layout_gravity="center"
             android:layout_margin="30dp"
             android:text="SCAN BLE"/>
+
+    <Button
+            android:id="@+id/connectDeviceButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="30dp"
+            android:text="CONNECT"/>
 </LinearLayout>
