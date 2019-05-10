@@ -10,20 +10,24 @@ import android.util.Log
 import com.tomaszkopacz.ecgmonitor.R
 import com.tomaszkopacz.ecgmonitor.ble.BLE
 import kotlinx.android.synthetic.main.activity_main.*
-import java.math.BigInteger
-import java.nio.ByteBuffer
 import java.util.*
+
 
 class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val REQUEST_ENABLE_BLE = 100
+
+        private const val SERVICE_UUID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e"
+        private const val RX_UUID = "6e400002-b5a3-f393-e0a9-e50e24dcca9e"
+        private const val TX_UUID = "6e400003-b5a3-f393-e0a9-e50e24dcca9e"
     }
 
     private var ble: BLE? = null
     private var device: BluetoothDevice? = null
     private var gatt: BluetoothGatt? = null
 
+    // when activity starts running
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -33,22 +37,27 @@ class MainActivity : AppCompatActivity() {
         setListeners()
     }
 
+    // init bluetooth configuration
     private fun initBle() {
         val bleManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         val bleAdapter = bleManager.adapter
         val bleHandler = Handler(Handler.Callback { true })
 
         if (bleAdapter.isEnabled)
+        // if bluetooth is enabled create BLE object
             this.ble = BLE(bleAdapter, bleHandler)
         else
+        // if bluetooth is not enabled request user to turn it on
             makeBleEnableIntent()
     }
 
+    // start intent to turn on bluetooth
     private fun makeBleEnableIntent() {
         val enableBleIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
         startActivityForResult(enableBleIntent, REQUEST_ENABLE_BLE)
     }
 
+    // listen to gui buttons
     private fun setListeners() {
         startBleScanButton.setOnClickListener {
             startScanBleDevice()
@@ -69,6 +78,7 @@ class MainActivity : AppCompatActivity() {
             ble!!.stopScanLeDevices(bleScanCallback)
     }
 
+    // callback for devices scan
     private val bleScanCallback = BluetoothAdapter.LeScanCallback { device, _, _ ->
         this.device = device
         Log.i("ECGMonitor", "Device discovered: " + device.name)
@@ -80,10 +90,15 @@ class MainActivity : AppCompatActivity() {
             this.gatt = this.device!!.connectGatt(this, false, bleGattCallback)
     }
 
+
+    // callback for device connection and ble status
     private val bleGattCallback = object : BluetoothGattCallback() {
         override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
+
             when (newState) {
                 BluetoothProfile.STATE_CONNECTED -> {
+
+                    // when connected, search for available services
                     Log.i("ECGMonitor", "CONNECTED")
                     gatt?.discoverServices()
                 }
@@ -97,20 +112,28 @@ class MainActivity : AppCompatActivity() {
         override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
             when (status) {
                 BluetoothGatt.GATT_SUCCESS -> {
+
+                    // when services are discovered log their uuids
                     Log.i("ECGMonitor", "SERVICE DISCOVERED")
                     for (service in gatt!!.services)
                         Log.i("ECGMonitor", "service: " + service.uuid)
 
-                    val service = gatt.getService(UUID.fromString("00001809-0000-1000-8000-00805f9b34fb"))
-                    val characteristic =
-                        service.getCharacteristic(UUID.fromString("00002a1c-0000-1000-8000-00805f9b34fb"))
-                    val descriptor =
-                        characteristic.getDescriptor(UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"))
+                    // get our service (ECG)
+                    val service = gatt.getService(UUID.fromString(SERVICE_UUID))
 
+                    // get TX characteristic (transmission)
+                    val characteristic =
+                        service.getCharacteristic(UUID.fromString(TX_UUID))
+
+                    // get descriptor of characteristic
+                    val descriptor =
+                        characteristic.getDescriptor(UUID.fromString("I dont know that uuid"))
+
+                    // enable notifications on this characteristic
                     gatt.setCharacteristicNotification(characteristic, true)
                     descriptor.apply {
-                        value = BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
-                        }
+                        value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                    }
                     gatt.writeDescriptor(descriptor)
                 }
 
@@ -123,10 +146,20 @@ class MainActivity : AppCompatActivity() {
 
         }
 
+        // when new value obtained
         override fun onCharacteristicChanged(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?) {
 
-            val ble = characteristic!!.getFloatValue(BluetoothGattCharacteristic.FORMAT_FLOAT, 1)
-            Log.i("ECGMonitor", "Value: $ble")
+            // print value bytes
+            val bleValue = characteristic!!.value
+            Log.i("ECGMonitor", "Value: $bleValue")
+
+            // convert bytes to number, i don't know if works
+            //val bb = ByteBuffer.wrap(byteArray)
+            //bb.order(ByteOrder.LITTLE_ENDIAN)
+            //while (bb.hasRemaining()) {
+            //    val v = bb.short
+            //    /* Do something with v... */
+            //}
         }
     }
 
