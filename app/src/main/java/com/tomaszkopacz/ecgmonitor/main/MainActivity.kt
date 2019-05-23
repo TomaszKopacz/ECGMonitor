@@ -7,10 +7,13 @@ import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import com.tomaszkopacz.ecgmonitor.R
+import com.google.common.primitives.Ints
 import com.tomaszkopacz.ecgmonitor.ble.BLE
 import kotlinx.android.synthetic.main.activity_main.*
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import java.util.*
+import kotlin.experimental.and
 
 
 class MainActivity : AppCompatActivity() {
@@ -18,9 +21,9 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val REQUEST_ENABLE_BLE = 100
 
-        private const val SERVICE_UUID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e"
-        private const val RX_UUID = "6e400002-b5a3-f393-e0a9-e50e24dcca9e"
-        private const val TX_UUID = "6e400003-b5a3-f393-e0a9-e50e24dcca9e"
+        private const val HR_SERVICE_UUID = "22c49ea5-3952-4d43-9f8c-dbe0adb66426"
+        private const val HRM_CHARACTERISTIC_UUID = "fefcab54-ad43-4d9c-948b-11e83f8d4b35"
+        private const val HRM_DESCRIPTOR_UUID = "5093d1ee-65e1-4345-8e73-9751697b5444"
     }
 
     private var ble: BLE? = null
@@ -30,7 +33,7 @@ class MainActivity : AppCompatActivity() {
     // when activity starts running
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(com.tomaszkopacz.ecgmonitor.R.layout.activity_main)
 
         initBle()
 
@@ -113,21 +116,31 @@ class MainActivity : AppCompatActivity() {
             when (status) {
                 BluetoothGatt.GATT_SUCCESS -> {
 
-                    // when services are discovered log their uuids
-                    Log.i("ECGMonitor", "SERVICE DISCOVERED")
+                    // list services
+                    Log.i("ECGMonitor", "SERVICES DISCOVERED")
                     for (service in gatt!!.services)
                         Log.i("ECGMonitor", "service: " + service.uuid)
 
-                    // get our service (ECG)
-                    val service = gatt.getService(UUID.fromString(SERVICE_UUID))
+                    // get our service (HEART RATE)
+                    val service = gatt.getService(UUID.fromString(HR_SERVICE_UUID))
 
-                    // get TX characteristic (transmission)
+                    // list characteristics
+                    Log.i("ECGMonitor", "CHARACTERISTICS DISCOVERED")
+                    for (characteristic in service.characteristics)
+                        Log.i("ECGMonitor", "characteristic: " + characteristic.uuid)
+
+                    // get our characteristic (HEART RATE MEASUREMENT)
                     val characteristic =
-                        service.getCharacteristic(UUID.fromString(TX_UUID))
+                        service.getCharacteristic(UUID.fromString(HRM_CHARACTERISTIC_UUID))
+
+                    // list descriptors
+                    Log.i("ECGMonitor", "DESCRIPTORS DISCOVERED")
+                    for (descriptor in characteristic.descriptors)
+                        Log.i("ECGMonitor", "descriptor: " + descriptor.uuid)
 
                     // get descriptor of characteristic
                     val descriptor =
-                        characteristic.getDescriptor(UUID.fromString("I dont know that uuid"))
+                        characteristic.getDescriptor(UUID.fromString(HRM_DESCRIPTOR_UUID))
 
                     // enable notifications on this characteristic
                     gatt.setCharacteristicNotification(characteristic, true)
@@ -143,23 +156,28 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun onDescriptorWrite(gatt: BluetoothGatt?, descriptor: BluetoothGattDescriptor?, status: Int) {
-
+            if(UUID.fromString(HRM_DESCRIPTOR_UUID) == descriptor!!.uuid) {
+                val characteristic = gatt!!
+                    .getService(UUID.fromString(HR_SERVICE_UUID))
+                    .getCharacteristic(UUID.fromString(HRM_CHARACTERISTIC_UUID))
+                gatt.readCharacteristic(characteristic)
+            }
         }
 
-        // when new value obtained
+        override fun onCharacteristicRead(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?, status: Int) {
+            if (UUID.fromString(HRM_CHARACTERISTIC_UUID) == characteristic!!.uuid) {
+                val data = characteristic.value
+                val value = Ints.fromByteArray(data)
+                Log.i("ECGMonitor", "Value: $value")
+            }
+        }
+
         override fun onCharacteristicChanged(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?) {
-
-            // print value bytes
-            val bleValue = characteristic!!.value
-            Log.i("ECGMonitor", "Value: $bleValue")
-
-            // convert bytes to number, i don't know if works
-            //val bb = ByteBuffer.wrap(byteArray)
-            //bb.order(ByteOrder.LITTLE_ENDIAN)
-            //while (bb.hasRemaining()) {
-            //    val v = bb.short
-            //    /* Do something with v... */
-            //}
+            if (UUID.fromString(HRM_CHARACTERISTIC_UUID) == characteristic!!.uuid) {
+                val data = characteristic.value
+                val value = Ints.fromByteArray(data)
+                Log.i("ECGMonitor", "Value: $value")
+            }
         }
     }
 

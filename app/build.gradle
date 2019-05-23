@@ -35,4 +35,8 @@ dependencies {
     def viewModelVersion = "1.1.1"
     implementation "android.arch.lifecycle:extensions:$viewModelVersion"
     implementation "android.arch.lifecycle:viewmodel:$viewModelVersion"
+
+    implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.2.4'
+    api 'com.google.guava:guava:27.1-android'
+
 }
