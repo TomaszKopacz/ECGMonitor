@@ -8,19 +8,65 @@
         tools:context=".main.MainActivity"
         android:orientation="vertical">
 
-    <Button
-            android:id="@+id/startBleScanButton"
-            android:layout_width="wrap_content"
+    <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_margin="30dp"
-            android:text="SCAN BLE"/>
+            android:orientation="horizontal"
+            android:weightSum="2">
 
-    <Button
-            android:id="@+id/connectDeviceButton"
+        <Button
+                android:id="@+id/startBleScanButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="30dp"
+                android:text="SCAN BLE"
+                android:layout_weight="1"/>
+
+        <TextView
+                android:id="@+id/scannedDeviceTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="30dp"
+                android:textSize="12sp"
+                android:text="NO DEVICE"
+                android:layout_weight="1"/>
+    </LinearLayout>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+        <Button
+                android:id="@+id/connectDeviceButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="30dp"
+                android:text="CONNECT"
+                android:layout_weight="1"/>
+
+        <TextView
+                android:id="@+id/connectedTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="30dp"
+                android:textSize="12sp"
+                android:text="DISCONNECTED"
+                android:layout_weight="1"/>
+
+    </LinearLayout>
+
+    <TextView
+            android:id="@+id/valueTV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_margin="30dp"
-            android:text="CONNECT"/>
+            android:textSize="30sp"/>
+
+
 </LinearLayout>
