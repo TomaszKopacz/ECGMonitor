@@ -37,8 +37,8 @@ class MainActivity : AppCompatActivity(), BLEView {
         bleClient.connectDevice()
     }
 
-    override fun notifyBleDevice(device: BluetoothDevice) {
-        scannedDeviceTV.text = device.name
+    override fun notifyBleDevice(device: BluetoothDevice?) {
+        scannedDeviceTV.text = if (device != null) device.name else "NO DEVICE"
     }
 
     override fun notifyBleConnection(connected: Boolean) {

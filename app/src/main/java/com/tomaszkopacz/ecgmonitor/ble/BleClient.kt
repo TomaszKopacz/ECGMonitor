@@ -133,8 +133,11 @@ class BleClient {
                 BluetoothProfile.STATE_DISCONNECTED -> {
                     Log.i("ECGMonitor", "DISCONNECTED")
 
+                    device = null
+
                     (context as Activity).runOnUiThread {
                         view.notifyBleConnection(false)
+                        view.notifyBleDevice(device)
                     }
                 }
             }
