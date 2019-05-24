@@ -222,7 +222,7 @@ class BleClient {
         if (UUID.fromString(HRM_CHARACTERISTIC_UUID) == characteristic!!.uuid) {
             val data = characteristic.value
             val value = Ints.fromByteArray(data)
-            Log.i("ECGMonitor", "Value: $value")
+//            Log.i("ECGMonitor", "Value: $value")
 
             (context as Activity).runOnUiThread {
                 view.notifyBleValue(value)
