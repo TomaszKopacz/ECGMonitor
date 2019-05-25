@@ -3,12 +3,18 @@ package com.tomaszkopacz.ecgmonitor.main
 import android.bluetooth.BluetoothDevice
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Environment
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.jjoe64.graphview.series.DataPoint
 import com.jjoe64.graphview.series.LineGraphSeries
 import com.tomaszkopacz.ecgmonitor.ble.BleClient
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.File
+import java.io.FileOutputStream
+import java.io.PrintWriter
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class MainActivity : AppCompatActivity(), BLEView {
@@ -18,6 +24,9 @@ class MainActivity : AppCompatActivity(), BLEView {
     private var ecgSeries: LineGraphSeries<DataPoint> = LineGraphSeries()
     private var diff1Series: LineGraphSeries<DataPoint> = LineGraphSeries()
     private var diff2Series: LineGraphSeries<DataPoint> = LineGraphSeries()
+
+    private var currentFile: File? = null
+    private var ecgData = IntArray(1000)
 
     private var timePointer: Double = 0.0
     private var lastEcgValue: Int = 0
@@ -101,15 +110,20 @@ class MainActivity : AppCompatActivity(), BLEView {
 
     private fun setListeners() {
         startBleScanButton.setOnClickListener {
-            startScanBleDevice()
+            scanBleDevice()
         }
 
         connectDeviceButton.setOnClickListener {
             connectBleDevice()
         }
+
+        stopBleButton.setOnClickListener {
+//            if (currentFile != null)
+//                saveFile(currentFile!!)
+        }
     }
 
-    private fun startScanBleDevice() {
+    private fun scanBleDevice() {
         bleClient.startScanBleDevices()
     }
 
@@ -123,11 +137,46 @@ class MainActivity : AppCompatActivity(), BLEView {
 
     override fun notifyBleConnection(connected: Boolean) {
         connectedTV.text = if (connected) "CONNECTED" else "DISCONNECTED"
+
+        createFile()
+    }
+
+    private fun createFile() {
+        if (isExternalStorageWritable()) {
+            currentFile = getFileExternalDirectory()
+        }
+    }
+
+    private fun isExternalStorageWritable(): Boolean {
+        return Environment.MEDIA_MOUNTED == Environment.getExternalStorageState()
+    }
+
+    private fun getFileExternalDirectory(): File {
+        val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).absolutePath + "/ECG"
+
+        val album = File(path)
+
+        if (!album.exists())
+            album.mkdirs()
+
+        val sdf = SimpleDateFormat("ddMMyyyyhhmmss", Locale.getDefault())
+
+        val filename = sdf.format(Date()) + ".csv"
+        val file = File(path, filename)
+
+        file.createNewFile()
+
+        Log.i("ECGMonitor", "New file created at: ${file.absolutePath}")
+        return file
     }
 
     var startTime = (-1).toLong()
 
+    var index = 0
     override fun notifyBleValue(value: Int) {
+
+        if (index == 999)
+            Log.i("ECGMonitor", "1000 samples")
 
         if (startTime == (-1).toLong()) {
             startTime = System.currentTimeMillis()
@@ -145,6 +194,26 @@ class MainActivity : AppCompatActivity(), BLEView {
         val currentDiff2 = (currentDiff1 - lastDiff1Value)
         val diff2Point = DataPoint(currentTime, currentDiff2)
         diff2Series.appendData(diff2Point, true, 1000)
+
+        ecgData[index] = value
+
+        if (index == 999) {
+            val fos = FileOutputStream(currentFile, true)
+            val pw = PrintWriter(fos)
+
+            for (sample in ecgData)
+                pw.appendln(sample.toString())
+
+            index = 0
+            ecgData = IntArray(1000)
+
+            pw.close()
+            fos.close()
+
+        } else {
+            index++
+        }
+
 
         lastEcgValue = value
         lastDiff1Value = currentDiff1.toInt()
