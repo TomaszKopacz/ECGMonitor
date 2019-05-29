@@ -22,6 +22,11 @@ class BleClient {
         private const val HR_SERVICE_UUID = "22c49ea5-3952-4d43-9f8c-dbe0adb66426"
         private const val HRM_CHARACTERISTIC_UUID = "fefcab54-ad43-4d9c-948b-11e83f8d4b35"
         private const val HRM_DESCRIPTOR_UUID = "5093d1ee-65e1-4345-8e73-9751697b5444"
+
+        private const val NORDIC_SERVICE_UUID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e"
+        private const val TX_CHARACTERISTIC_UUID = "6e400003-b5a3-f393-e0a9-e50e24dcca9e"
+        private const val RX_CHARACTERISTIC_UUID = "6e400002-b5a3-f393-e0a9-e50e24dcca9e"
+        private const val TX_DESCRIPTOR_UUID = "00002902-0000-1000-8000-00805f9b34fb"
     }
 
     private lateinit var context: Context
@@ -148,11 +153,12 @@ class BleClient {
                 BluetoothGatt.GATT_SUCCESS -> {
 
                     logServices()
-                    val service = gatt!!.getService(UUID.fromString(HR_SERVICE_UUID))
+                    //val service = gatt!!.getService(UUID.fromString(HR_SERVICE_UUID))
+                    val service = gatt!!.getService(UUID.fromString(NORDIC_SERVICE_UUID))
 
                     logCharacteristics(service)
-                    val characteristic =
-                        service.getCharacteristic(UUID.fromString(HRM_CHARACTERISTIC_UUID))
+                    //val characteristic = service.getCharacteristic(UUID.fromString(HRM_CHARACTERISTIC_UUID))
+                    val characteristic = service.getCharacteristic(UUID.fromString(TX_CHARACTERISTIC_UUID))
 
                     logDescriptors(characteristic)
 
@@ -168,6 +174,10 @@ class BleClient {
 
         override fun onDescriptorWrite(gatt: BluetoothGatt?, descriptor: BluetoothGattDescriptor?, status: Int) {
             if(UUID.fromString(HRM_DESCRIPTOR_UUID) == descriptor!!.uuid) {
+                requestReadCharacteristic()
+            }
+
+            if(UUID.fromString(TX_DESCRIPTOR_UUID) == descriptor.uuid) {
                 requestReadCharacteristic()
             }
         }
@@ -200,8 +210,8 @@ class BleClient {
     }
 
     private fun enableNotificationToCharacteristic(characteristic: BluetoothGattCharacteristic?) {
-        val descriptor =
-            characteristic!!.getDescriptor(UUID.fromString(HRM_DESCRIPTOR_UUID))
+//        val descriptor = characteristic!!.getDescriptor(UUID.fromString(HRM_DESCRIPTOR_UUID))
+        val descriptor = characteristic!!.getDescriptor(UUID.fromString(TX_DESCRIPTOR_UUID))
 
         gatt!!.setCharacteristicNotification(characteristic, true)
         descriptor.apply {
@@ -213,20 +223,30 @@ class BleClient {
 
     private fun requestReadCharacteristic() {
         val characteristic = gatt!!
-            .getService(UUID.fromString(HR_SERVICE_UUID))
-            .getCharacteristic(UUID.fromString(HRM_CHARACTERISTIC_UUID))
+            .getService(UUID.fromString(NORDIC_SERVICE_UUID))
+            .getCharacteristic(UUID.fromString(TX_CHARACTERISTIC_UUID))
         gatt!!.readCharacteristic(characteristic)
+//        val characteristic = gatt!!
+//            .getService(UUID.fromString(HR_SERVICE_UUID))
+//            .getCharacteristic(UUID.fromString(HRM_CHARACTERISTIC_UUID))
+//        gatt!!.readCharacteristic(characteristic)
     }
 
     private fun readCharacteristic(characteristic: BluetoothGattCharacteristic?) {
         if (UUID.fromString(HRM_CHARACTERISTIC_UUID) == characteristic!!.uuid) {
             val data = characteristic.value
             val value = Ints.fromByteArray(data)
-//            Log.i("ECGMonitor", "Value: $value")
+            Log.i("ECGMonitor", "Value: $value")
 
             (context as Activity).runOnUiThread {
                 view.notifyBleValue(value)
             }
+        }
+
+        if (UUID.fromString(TX_CHARACTERISTIC_UUID) == characteristic.uuid) {
+            val data1 = characteristic.value[0]
+            val data2 = characteristic.value[1]
+            Log.i("ECGMonitor", "Value1: $data1, Value2: $data2")
         }
     }
 }
