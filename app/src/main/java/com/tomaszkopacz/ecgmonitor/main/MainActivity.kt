@@ -9,6 +9,7 @@ import android.util.Log
 import com.jjoe64.graphview.series.DataPoint
 import com.jjoe64.graphview.series.LineGraphSeries
 import com.tomaszkopacz.ecgmonitor.ble.BleClient
+import com.tomaszkopacz.ecgmonitor.ble.BleNordicClient
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.io.FileOutputStream
@@ -19,7 +20,7 @@ import java.util.*
 
 class MainActivity : AppCompatActivity(), BLEView {
 
-    private var bleClient: BleClient = BleClient()
+    private var bleClient: BleClient = BleNordicClient()
 
     private var ecgSeries: LineGraphSeries<DataPoint> = LineGraphSeries()
     private var diff1Series: LineGraphSeries<DataPoint> = LineGraphSeries()
@@ -61,8 +62,8 @@ class MainActivity : AppCompatActivity(), BLEView {
         ecgGraph.viewport.setMaxX(10.toDouble())
 
         ecgGraph.viewport.isYAxisBoundsManual = true
-        ecgGraph.viewport.setMinY(450.toDouble())
-        ecgGraph.viewport.setMaxY(900.toDouble())
+        ecgGraph.viewport.setMinY((-150).toDouble())
+        ecgGraph.viewport.setMaxY(150.toDouble())
 
         ecgSeries.color = Color.RED
         ecgGraph.addSeries(ecgSeries)
@@ -118,8 +119,7 @@ class MainActivity : AppCompatActivity(), BLEView {
         }
 
         stopBleButton.setOnClickListener {
-//            if (currentFile != null)
-//                saveFile(currentFile!!)
+
         }
     }
 
@@ -213,7 +213,6 @@ class MainActivity : AppCompatActivity(), BLEView {
         } else {
             index++
         }
-
 
         lastEcgValue = value
         lastDiff1Value = currentDiff1.toInt()
