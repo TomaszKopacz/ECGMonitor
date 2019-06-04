@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity(), BLEView {
 
         ecgGraph.viewport.isXAxisBoundsManual = true
         ecgGraph.viewport.setMinX(0.toDouble())
-        ecgGraph.viewport.setMaxX(10.toDouble())
+        ecgGraph.viewport.setMaxX(3.toDouble())
 
         ecgGraph.viewport.isYAxisBoundsManual = true
         ecgGraph.viewport.setMinY((-150).toDouble())
@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity(), BLEView {
 
         diff1Graph.viewport.isXAxisBoundsManual = true
         diff1Graph.viewport.setMinX(0.toDouble())
-        diff1Graph.viewport.setMaxX(10.toDouble())
+        diff1Graph.viewport.setMaxX(3.toDouble())
 
         diff1Graph.viewport.isYAxisBoundsManual = true
         diff1Graph.viewport.setMinY((-500).toDouble())
@@ -100,7 +100,7 @@ class MainActivity : AppCompatActivity(), BLEView {
 
         diff2Graph.viewport.isXAxisBoundsManual = true
         diff2Graph.viewport.setMinX(0.toDouble())
-        diff2Graph.viewport.setMaxX(10.toDouble())
+        diff2Graph.viewport.setMaxX(3.toDouble())
 
         diff2Graph.viewport.isYAxisBoundsManual = true
         diff2Graph.viewport.setMinY((-500).toDouble())
