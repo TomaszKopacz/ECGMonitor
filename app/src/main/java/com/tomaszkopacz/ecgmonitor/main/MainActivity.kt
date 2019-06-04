@@ -27,7 +27,8 @@ class MainActivity : AppCompatActivity(), BLEView {
     private var diff2Series: LineGraphSeries<DataPoint> = LineGraphSeries()
 
     private var currentFile: File? = null
-    private var ecgData = IntArray(1000)
+    private var MAX_ARRAY_SIZE = 100
+    private var ecgData = Array(MAX_ARRAY_SIZE) {DoubleArray(4)}
 
     private var timePointer: Double = 0.0
     private var lastEcgValue: Int = 0
@@ -138,7 +139,8 @@ class MainActivity : AppCompatActivity(), BLEView {
     override fun notifyBleConnection(connected: Boolean) {
         connectedTV.text = if (connected) "CONNECTED" else "DISCONNECTED"
 
-        createFile()
+        if (connected)
+            createFile()
     }
 
     private fun createFile() {
@@ -175,9 +177,6 @@ class MainActivity : AppCompatActivity(), BLEView {
     var index = 0
     override fun notifyBleValue(value: Int) {
 
-        if (index == 999)
-            Log.i("ECGMonitor", "1000 samples")
-
         if (startTime == (-1).toLong()) {
             startTime = System.currentTimeMillis()
         }
@@ -195,17 +194,18 @@ class MainActivity : AppCompatActivity(), BLEView {
         val diff2Point = DataPoint(currentTime, currentDiff2)
         diff2Series.appendData(diff2Point, true, 1000)
 
-        ecgData[index] = value
+        ecgData[index] = doubleArrayOf(currentTime, value.toDouble(), currentDiff1, currentDiff2)
 
-        if (index == 999) {
+        if (index == MAX_ARRAY_SIZE - 1) {
             val fos = FileOutputStream(currentFile, true)
             val pw = PrintWriter(fos)
 
-            for (sample in ecgData)
-                pw.appendln(sample.toString())
+            for (sample in ecgData) {
+                pw.appendln(sample.joinToString())
+            }
 
             index = 0
-            ecgData = IntArray(1000)
+            ecgData = Array(MAX_ARRAY_SIZE) {DoubleArray(4)}
 
             pw.close()
             fos.close()
