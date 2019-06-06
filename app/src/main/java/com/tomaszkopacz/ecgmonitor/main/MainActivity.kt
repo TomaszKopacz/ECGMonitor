@@ -1,13 +1,18 @@
 package com.tomaszkopacz.ecgmonitor.main
 
 import android.bluetooth.BluetoothDevice
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Environment
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import com.jjoe64.graphview.series.DataPoint
 import com.jjoe64.graphview.series.LineGraphSeries
+import com.tomaszkopacz.ecgmonitor.R
+import com.tomaszkopacz.ecgmonitor.analysis.AnalysisActivity
 import com.tomaszkopacz.ecgmonitor.ble.BleClient
 import com.tomaszkopacz.ecgmonitor.ble.BleNordicClient
 import kotlinx.android.synthetic.main.activity_main.*
@@ -41,6 +46,22 @@ class MainActivity : AppCompatActivity(), BLEView {
         bleClient.onCreate(this, this)
         setGraphs()
         setListeners()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        val id = item!!.itemId
+
+        if(id == R.id.action_analysis) {
+            val intent = Intent(this, AnalysisActivity::class.java)
+            startActivity(intent)
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 
     private fun setGraphs() {
