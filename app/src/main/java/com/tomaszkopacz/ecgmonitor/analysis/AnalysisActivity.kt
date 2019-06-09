@@ -77,18 +77,6 @@ class AnalysisActivity : AppCompatActivity(), MyRecyclerViewAdapter.ItemListener
                 splitLineToArrays(element, index)
             }
 
-            for (time in timeArray)
-                Log.i("ECGMonitor", "Time: $time")
-
-            for (ecg in ecgArray)
-                Log.i("ECGMonitor", "ECG: $ecg")
-
-            for (diff1 in diff1Array)
-                Log.i("ECGMonitor", "diff1: $diff1")
-
-            for (diff2 in diff2Array)
-                Log.i("ECGMonitor", "diff2: $diff2")
-
         } catch (e: IOException) {
             e.printStackTrace()
         } finally {
