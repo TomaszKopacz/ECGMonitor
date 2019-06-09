@@ -21,10 +21,10 @@ class AnalysisActivity : AppCompatActivity(), MyRecyclerViewAdapter.ItemListener
     private lateinit var listLayout: RecyclerView.LayoutManager
     private lateinit var listAdapter: MyRecyclerViewAdapter
 
-    private val timeArray = ArrayList<Double>()
-    private val ecgArray = ArrayList<Double>()
-    private val diff1Array = ArrayList<Double>()
-    private val diff2Array = ArrayList<Double>()
+    private var timeArray = DoubleArray(0)
+    private var ecgArray = DoubleArray(0)
+    private var diff1Array = DoubleArray(0)
+    private var diff2Array = DoubleArray(0)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,9 +62,32 @@ class AnalysisActivity : AppCompatActivity(), MyRecyclerViewAdapter.ItemListener
 
         try {
             br = BufferedReader(FileReader(file))
-            br.lineSequence().forEach {
-                splitLineToArrays(it)
+
+            var elementCount = 0
+            for (it in br.lineSequence())
+                elementCount++
+
+            timeArray = DoubleArray(elementCount)
+            ecgArray = DoubleArray(elementCount)
+            diff1Array = DoubleArray(elementCount)
+            diff2Array = DoubleArray(elementCount)
+
+            br = BufferedReader(FileReader(file))
+            br.lineSequence().forEachIndexed{ index, element ->
+                splitLineToArrays(element, index)
             }
+
+            for (time in timeArray)
+                Log.i("ECGMonitor", "Time: $time")
+
+            for (ecg in ecgArray)
+                Log.i("ECGMonitor", "ECG: $ecg")
+
+            for (diff1 in diff1Array)
+                Log.i("ECGMonitor", "diff1: $diff1")
+
+            for (diff2 in diff2Array)
+                Log.i("ECGMonitor", "diff2: $diff2")
 
         } catch (e: IOException) {
             e.printStackTrace()
@@ -77,13 +100,13 @@ class AnalysisActivity : AppCompatActivity(), MyRecyclerViewAdapter.ItemListener
         }
     }
 
-    private fun splitLineToArrays(it: String) {
+    private fun splitLineToArrays(string: String, index: Int) {
         val delimiter = ", "
-        val parts = it.split(delimiter)
+        val parts = string.split(delimiter)
 
-        timeArray.add(parts[0].toDouble())
-        ecgArray.add(parts[1].toDouble())
-        diff1Array.add(parts[2].toDouble())
-        diff2Array.add(parts[3].toDouble())
+        timeArray[index] = parts[0].toDouble()
+        ecgArray[index] = parts[1].toDouble()
+        diff1Array[index] = parts[2].toDouble()
+        diff2Array[index] = parts[3].toDouble()
     }
 }
