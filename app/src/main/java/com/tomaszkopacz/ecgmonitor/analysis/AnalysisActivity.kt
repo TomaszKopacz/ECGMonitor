@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.View
 import com.tomaszkopacz.ecgmonitor.R
+import com.tomaszkopacz.ecgmonitor.hrv.HRV
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
@@ -54,7 +55,23 @@ class AnalysisActivity : AppCompatActivity(), MyRecyclerViewAdapter.ItemListener
 
     override fun onItemClicked(view: View?, position: Int) {
         val filename = filesList[position]
-        readEcgFile(File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).absolutePath + "/ECG", filename))
+        analyseEcgFile(File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).absolutePath + "/ECG", filename))
+    }
+
+    private fun analyseEcgFile(file: File?) {
+        readEcgFile(file)
+
+        val average = HRV.countAverage(diff1Array)
+        val variance = HRV.countVariance(diff1Array)
+        val sd = HRV.countStandardDeviation(diff1Array)
+        val RRs = HRV.countRR(timeArray, diff1Array)
+
+        Log.i("ECGMonitor", "Average: $average")
+        Log.i("ECGMonitor", "Variance: $variance")
+        Log.i("ECGMonitor", "Standard deviation: $sd")
+
+        for (rr in RRs)
+            Log.i("ECGMonitor", "RRs: $rr")
     }
 
     private fun readEcgFile(file: File?) {
