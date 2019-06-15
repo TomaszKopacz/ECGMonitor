@@ -15,6 +15,7 @@ import com.tomaszkopacz.ecgmonitor.R
 import com.tomaszkopacz.ecgmonitor.analysis.AnalysisActivity
 import com.tomaszkopacz.ecgmonitor.ble.BleClient
 import com.tomaszkopacz.ecgmonitor.ble.BleNordicClient
+import com.tomaszkopacz.ecgmonitor.constants.EcgGraphs
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.io.FileOutputStream
@@ -80,12 +81,12 @@ class MainActivity : AppCompatActivity(), BLEView {
         ecgGraph.viewport.setScrollableY(false)
 
         ecgGraph.viewport.isXAxisBoundsManual = true
-        ecgGraph.viewport.setMinX(0.toDouble())
-        ecgGraph.viewport.setMaxX(3.toDouble())
+        ecgGraph.viewport.setMinX(EcgGraphs.RealEcg.MIN_X)
+        ecgGraph.viewport.setMaxX(EcgGraphs.RealEcg.MAX_X)
 
         ecgGraph.viewport.isYAxisBoundsManual = true
-        ecgGraph.viewport.setMinY((-150).toDouble())
-        ecgGraph.viewport.setMaxY(150.toDouble())
+        ecgGraph.viewport.setMinY(EcgGraphs.RealEcg.MIN_ECG_Y)
+        ecgGraph.viewport.setMaxY(EcgGraphs.RealEcg.MAX_ECG_Y)
 
         ecgSeries.color = Color.RED
         ecgGraph.addSeries(ecgSeries)
@@ -101,12 +102,12 @@ class MainActivity : AppCompatActivity(), BLEView {
         diff1Graph.viewport.setScrollableY(false)
 
         diff1Graph.viewport.isXAxisBoundsManual = true
-        diff1Graph.viewport.setMinX(0.toDouble())
-        diff1Graph.viewport.setMaxX(3.toDouble())
+        diff1Graph.viewport.setMinX(EcgGraphs.RealEcg.MIN_X)
+        diff1Graph.viewport.setMaxX(EcgGraphs.RealEcg.MAX_X)
 
         diff1Graph.viewport.isYAxisBoundsManual = true
-        diff1Graph.viewport.setMinY((-500).toDouble())
-        diff1Graph.viewport.setMaxY(500.toDouble())
+        diff1Graph.viewport.setMinY(EcgGraphs.RealEcg.MIN_DIFF1_Y)
+        diff1Graph.viewport.setMaxY(EcgGraphs.RealEcg.MAX_DIFF1_Y)
 
         diff1Graph.addSeries(diff1Series)
     }
@@ -121,12 +122,12 @@ class MainActivity : AppCompatActivity(), BLEView {
         diff2Graph.viewport.setScrollableY(false)
 
         diff2Graph.viewport.isXAxisBoundsManual = true
-        diff2Graph.viewport.setMinX(0.toDouble())
-        diff2Graph.viewport.setMaxX(3.toDouble())
+        diff2Graph.viewport.setMinX(EcgGraphs.RealEcg.MIN_X)
+        diff2Graph.viewport.setMaxX(EcgGraphs.RealEcg.MAX_X)
 
         diff2Graph.viewport.isYAxisBoundsManual = true
-        diff2Graph.viewport.setMinY((-500).toDouble())
-        diff2Graph.viewport.setMaxY(500.toDouble())
+        diff2Graph.viewport.setMinY(EcgGraphs.RealEcg.MIN_DIFF2_Y)
+        diff2Graph.viewport.setMaxY(EcgGraphs.RealEcg.MAX_DIFF2_Y)
 
         diff2Graph.addSeries(diff2Series)
     }

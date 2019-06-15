@@ -3,7 +3,7 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="match_parent" xmlns:app="http://schemas.android.com/apk/res-auto"
         tools:context=".analysis.AnalysisActivity"
         android:orientation="vertical"
         android:weightSum="4">
@@ -14,5 +14,131 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"/>
+
+    <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="3"
+            android:layout_margin="15dp">
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="EKG"
+                    android:layout_margin="15dp"
+                    android:textStyle="bold"/>
+
+            <com.jjoe64.graphview.GraphView
+                    android:id="@+id/ecgGraph"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:layout_margin="5dp"/>
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Pierwsza pochodna EKG"
+                    android:layout_margin="15dp"
+                    android:textStyle="bold"/>
+
+            <com.jjoe64.graphview.GraphView
+                    android:id="@+id/diff1Graph"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:layout_margin="5dp"/>
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Druga pochodna EKG"
+                    android:layout_margin="15dp"
+                    android:textStyle="bold"/>
+
+            <com.jjoe64.graphview.GraphView
+                    android:id="@+id/diff2Graph"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:layout_margin="5dp"/>
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Interwały RR"
+                    android:layout_margin="15dp"
+                    android:textStyle="bold"/>
+
+            <com.jjoe64.graphview.helper.GraphViewXML
+                    android:id="@+id/rrGraph"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    app:seriesType="bar"
+                    app:seriesData="0=0"/>
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Analiza HRV"
+                    android:layout_margin="15dp"
+                    android:textStyle="bold"/>
+
+            <TextView
+                    android:id="@+id/RMSSDView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_margin="5dp"
+                    android:text="RMSSD: "/>
+
+            <TextView
+                    android:id="@+id/NN50View"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_margin="5dp"
+                    android:text="NN50: "/>
+
+            <TextView
+                    android:id="@+id/PNN50View"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_margin="5dp"
+                    android:text="PNN50: "/>
+
+            <TextView
+                    android:id="@+id/SDSDView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_margin="5dp"
+                    android:text="SDSD: "/>
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Wykres Poincare"
+                    android:layout_margin="15dp"
+                    android:textStyle="bold"/>
+
+            <com.jjoe64.graphview.helper.GraphViewXML
+                    android:id="@+id/poincareGraph"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    app:seriesData="0=0"/>
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </LinearLayout>

@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">ECGMonitor</string>
     <string name="action_analysis">Analiza</string>
+
+    <string name="RMSSDText">RMSSD: %1$s</string>
+    <string name="NN50">NN50: %1$s</string>
+    <string name="PNN50">PNN50: %1$s %</string>
+    <string name="SDSD">SDSD: %1$s</string>
 </resources>
